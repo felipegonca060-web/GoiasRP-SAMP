@@ -15,17 +15,18 @@ jobs:
       - name: Baixar projeto
         uses: actions/checkout@v4
 
-      - name: Configurar Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
       - name: Instalar Godot
         uses: chickensoft-games/setup-godot@v2
         with:
           version: 4.5.1
           use-dotnet: false
+
+      - name: Verificar arquivos
+        run: |
+          echo "Projeto:"
+          ls -la game3d
+          echo "Workflow:"
+          ls -la .github/workflows
 
       - name: Verificar projeto Godot
         run: |
@@ -34,17 +35,17 @@ jobs:
             --editor \
             --quit
 
-      - name: Criar pasta de saída
+      - name: Criar saída
         run: mkdir -p game3d/build
 
-      - name: Gerar APK Godot
+      - name: Exportar Android
         run: |
           godot --headless \
             --path game3d \
             --export-debug "Android" \
             build/goias-roleplay.apk
 
-      - name: Disponibilizar APK
+      - name: Enviar APK
         uses: actions/upload-artifact@v4
         with:
           name: GoiasRP-Godot-APK
