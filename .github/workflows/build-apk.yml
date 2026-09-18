@@ -24,7 +24,8 @@ jobs:
       - name: Configurar Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: "platform-tools platforms;android-35 build-tools;35.0.0 cmdline-tools;latest cmake;3.10.2.4988404 ndk;28.1.13356709"
+          packages: "platform-tools platforms;android-35 build-tools;35.0.0 cmake;3.10.2.4988404 ndk;28.1.13356709"
+
       - name: Instalar Godot
         uses: chickensoft-games/setup-godot@v2
         with:
@@ -60,54 +61,42 @@ jobs:
           echo "Templates instalados:"
           ls -lah "$TEMPLATE_DIR"
 
-      - name: Configurar caminhos Android
+      - name: Diagnosticar ambiente
         run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "JAVA_HOME=$JAVA_HOME"
-          adb version
-          java -version
+          echo "===== GODOT ====="
           godot --version
 
-      - name: Verificar templates
-        run: |
-          ls -lh "$HOME/.local/share/godot/export_templates/4.5.1.stable/"
+          echo "===== JAVA ====="
+          java -version
+
+          echo "===== ANDROID ====="
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          adb version
+
+          echo "===== TEMPLATES ====="
+          ls -lah "$HOME/.local/share/godot/export_templates/4.5.1.stable/"
+
+          echo "===== VERSION ====="
+          cat "$HOME/.local/share/godot/export_templates/4.5.1.stable/version.txt"
 
       - name: Criar saída
         run: |
           mkdir -p game3d/build
 
-            - name: Diagnosticar exportação Android
+      - name: Exportar APK
         run: |
-          echo "===== GODOT ====="
-          godot --version
-
-          echo "===== ANDROID ====="
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          ls -la "$ANDROID_HOME"
-
-          echo "===== JAVA ====="
-          java -version
-
-          echo "===== TEMPLATES ====="
-          TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/4.5.1.stable"
-          ls -lah "$TEMPLATE_DIR"
-          echo "VERSION:"
-          cat "$TEMPLATE_DIR/version.txt"
-
-          echo "===== PROJECT ====="
-          cat game3d/project.godot
-
-          echo "===== PRESET ====="
-          cat game3d/export_presets.cfg
-
-          echo "===== EXPORT HELP ====="
-          godot --headless --help | grep -i -A3 -B3 "export"
-
-          echo "===== EXPORT ====="
-          mkdir -p game3d/build
-
           godot --headless \
             --verbose \
             --path game3d \
             --export-debug "Android" \
             build/goias-roleplay.apk
+
+      - name: Verificar APK
+        run: |
+          ls -lh game3d/build/goias-roleplay.apk
+
+      - name: Disponibilizar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GoiasRP-Godot-APK
+          path: game3d/build/goias-roleplay.apk
