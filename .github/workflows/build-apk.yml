@@ -34,7 +34,9 @@ jobs:
       - name: Instalar templates Android
         run: |
           TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/4.5.1.stable"
-          echo "4.5.1.stable" > "$TEMPLATE_DIR/version.txt"
+
+          rm -rf "$TEMPLATE_DIR"
+          mkdir -p "$TEMPLATE_DIR"
 
           wget -O /tmp/templates.tpz \
             "https://github.com/godotengine/godot/releases/download/4.5.1-stable/Godot_v4.5.1-stable_export_templates.tpz"
@@ -53,8 +55,10 @@ jobs:
             -o -name "android_source.zip" \) \
             -exec cp {} "$TEMPLATE_DIR/" \;
 
+          echo "4.5.1.stable" > "$TEMPLATE_DIR/version.txt"
+
           echo "Templates instalados:"
-          ls -lh "$TEMPLATE_DIR"
+          ls -lah "$TEMPLATE_DIR"
 
       - name: Configurar caminhos Android
         run: |
