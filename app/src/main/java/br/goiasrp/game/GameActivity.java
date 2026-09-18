@@ -163,7 +163,14 @@ public class GameActivity extends Activity {
                     destino.mkdirs();
                 }
 
-                copiarPasta(treeUri, treeUri, destino);
+                String documentId =
+        DocumentsContract.getTreeDocumentId(treeUri);
+
+copiarPasta(
+        treeUri,
+        documentId,
+        destino
+);
 
                 runOnUiThread(() -> {
 
@@ -196,90 +203,88 @@ public class GameActivity extends Activity {
         }).start();
     }
 
-    private void copiarPasta(
-            Uri raizUri,
-            Uri pastaUri,
-            File destino) throws Exception {
+private void copiarPasta(
+        Uri raizUri,
+        String documentId,
+        File destino) throws Exception {
 
-        String documentId =
-                DocumentsContract.getDocumentId(pastaUri);
+    Uri childrenUri =
+            DocumentsContract.buildChildDocumentsUriUsingTree(
+                    raizUri,
+                    documentId
+            );
 
-        Uri childrenUri =
-                DocumentsContract.buildChildDocumentsUriUsingTree(
-                        raizUri,
-                        documentId
-                );
+    Cursor cursor = getContentResolver().query(
+            childrenUri,
+            new String[]{
+                    DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                    DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                    DocumentsContract.Document.COLUMN_MIME_TYPE
+            },
+            null,
+            null,
+            null
+    );
 
-        Cursor cursor = getContentResolver().query(
-                childrenUri,
-                new String[]{
-                        DocumentsContract.Document.COLUMN_DOCUMENT_ID,
-                        DocumentsContract.Document.COLUMN_DISPLAY_NAME,
-                        DocumentsContract.Document.COLUMN_MIME_TYPE
-                },
-                null,
-                null,
-                null
+    if (cursor == null) {
+        throw new Exception("Não foi possível ler a pasta.");
+    }
+
+    try {
+
+        int idColumn = cursor.getColumnIndex(
+                DocumentsContract.Document.COLUMN_DOCUMENT_ID
         );
 
-        if (cursor == null) {
-            throw new Exception("Não foi possível ler a pasta.");
-        }
+        int nameColumn = cursor.getColumnIndex(
+                DocumentsContract.Document.COLUMN_DISPLAY_NAME
+        );
 
-        try {
+        int mimeColumn = cursor.getColumnIndex(
+                DocumentsContract.Document.COLUMN_MIME_TYPE
+        );
 
-            int idColumn = cursor.getColumnIndex(
-                    DocumentsContract.Document.COLUMN_DOCUMENT_ID
-            );
+        while (cursor.moveToNext()) {
 
-            int nameColumn = cursor.getColumnIndex(
-                    DocumentsContract.Document.COLUMN_DISPLAY_NAME
-            );
+            String id = cursor.getString(idColumn);
+            String nome = cursor.getString(nameColumn);
+            String mime = cursor.getString(mimeColumn);
 
-            int mimeColumn = cursor.getColumnIndex(
-                    DocumentsContract.Document.COLUMN_MIME_TYPE
-            );
+            File destinoArquivo =
+                    new File(destino, nome);
 
-            while (cursor.moveToNext()) {
-
-                String id = cursor.getString(idColumn);
-                String nome = cursor.getString(nameColumn);
-                String mime = cursor.getString(mimeColumn);
-
-                Uri arquivoUri =
-                        DocumentsContract.buildDocumentUriUsingTree(
-                                raizUri,
-                                id
-                        );
-
-                File destinoArquivo =
-                        new File(destino, nome);
-
-                if (DocumentsContract.Document.MIME_TYPE_DIR.equals(mime)) {
-
-                    if (!destinoArquivo.exists()) {
-                        destinoArquivo.mkdirs();
-                    }
-
-                    copiarPasta(
+            Uri arquivoUri =
+                    DocumentsContract.buildDocumentUriUsingTree(
                             raizUri,
-                            arquivoUri,
-                            destinoArquivo
+                            id
                     );
 
-                } else {
+            if (DocumentsContract.Document.MIME_TYPE_DIR.equals(mime)) {
 
-                    copiarArquivo(
-                            arquivoUri,
-                            destinoArquivo
-                    );
+                if (!destinoArquivo.exists()) {
+                    destinoArquivo.mkdirs();
                 }
-            }
 
-        } finally {
-            cursor.close();
+                copiarPasta(
+                        raizUri,
+                        id,
+                        destinoArquivo
+                );
+
+            } else {
+
+                copiarArquivo(
+                        arquivoUri,
+                        destinoArquivo
+                );
+            }
         }
+
+    } finally {
+
+        cursor.close();
     }
+}
 
     private void copiarArquivo(
             Uri origem,
