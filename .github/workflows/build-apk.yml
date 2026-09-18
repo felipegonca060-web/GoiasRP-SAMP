@@ -83,11 +83,28 @@ jobs:
         run: |
           mkdir -p game3d/build
 
-      - name: Exportar APK
+            - name: Validar preset Android
         run: |
+          cd game3d
+
+          echo "===== ARQUIVOS ====="
+          ls -lah
+
+          echo "===== PRESET ====="
+          cat export_presets.cfg
+
+          echo "===== PROJETO ====="
+          cat project.godot
+
+          echo "===== EXPORT PRESETS ====="
+          godot --headless --path . --editor --quit --verbose
+
+          echo "===== EXPORT ====="
+          mkdir -p build
+
           godot --headless \
-            --verbose \
-            --path game3d \
+            --path . \
+            --editor \
             --export-debug "Android" \
             build/goias-roleplay.apk
 
