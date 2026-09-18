@@ -34,22 +34,28 @@ jobs:
 
       - name: Instalar templates Android
         run: |
-          mkdir -p "$HOME/.local/share/godot/export_templates/4.5.1.stable"
+          TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/4.5.1.stable"
+          mkdir -p "$TEMPLATE_DIR"
 
           wget -O /tmp/templates.tpz \
             "https://github.com/godotengine/godot/releases/download/4.5.1-stable/Godot_v4.5.1-stable_export_templates.tpz"
 
+          rm -rf /tmp/godot-templates
+          mkdir -p /tmp/godot-templates
+
           unzip -q /tmp/templates.tpz -d /tmp/godot-templates
 
-          find /tmp/godot-templates \
-            -type f \
-            -name "android_debug.apk" \
-            -exec cp {} "$HOME/.local/share/godot/export_templates/4.5.1.stable/" \;
+          echo "Templates encontrados:"
+          find /tmp/godot-templates -type f
 
-          find /tmp/godot-templates \
-            -type f \
-            -name "android_release.apk" \
-            -exec cp {} "$HOME/.local/share/godot/export_templates/4.5.1.stable/" \;
+          find /tmp/godot-templates -type f \
+            \( -name "android_debug.apk" \
+            -o -name "android_release.apk" \
+            -o -name "android_source.zip" \) \
+            -exec cp {} "$TEMPLATE_DIR/" \;
+
+          echo "Templates instalados:"
+          ls -lh "$TEMPLATE_DIR"
 
       - name: Configurar caminhos Android
         run: |
