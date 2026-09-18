@@ -15,6 +15,17 @@ jobs:
       - name: Baixar projeto
         uses: actions/checkout@v4
 
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: "platform-tools platforms;android-35 build-tools;35.0.0"
+
       - name: Instalar Godot
         uses: chickensoft-games/setup-godot@v2
         with:
@@ -24,26 +35,35 @@ jobs:
       - name: Instalar templates Android
         run: |
           mkdir -p "$HOME/.local/share/godot/export_templates/4.5.1.stable"
+
           wget -O /tmp/templates.tpz \
-            https://github.com/godotengine/godot/releases/download/4.5.1-stable/Godot_v4.5.1-stable_export_templates.tpz
+            "https://github.com/godotengine/godot/releases/download/4.5.1-stable/Godot_v4.5.1-stable_export_templates.tpz"
+
           unzip -q /tmp/templates.tpz -d /tmp/godot-templates
-          find /tmp/godot-templates -type f -name "android_debug.apk" \
+
+          find /tmp/godot-templates \
+            -type f \
+            -name "android_debug.apk" \
             -exec cp {} "$HOME/.local/share/godot/export_templates/4.5.1.stable/" \;
-          find /tmp/godot-templates -type f -name "android_release.apk" \
+
+          find /tmp/godot-templates \
+            -type f \
+            -name "android_release.apk" \
             -exec cp {} "$HOME/.local/share/godot/export_templates/4.5.1.stable/" \;
+
+      - name: Configurar caminhos Android
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "JAVA_HOME=$JAVA_HOME"
+          adb version
+          java -version
+          godot --version
 
       - name: Verificar templates
         run: |
           ls -lh "$HOME/.local/share/godot/export_templates/4.5.1.stable/"
 
-      - name: Verificar projeto
-        run: |
-          godot --headless \
-            --path game3d \
-            --editor \
-            --quit
-
-      - name: Criar pasta de saída
+      - name: Criar saída
         run: |
           mkdir -p game3d/build
 
@@ -51,11 +71,10 @@ jobs:
         run: |
           godot --headless \
             --path game3d \
-            --verbose \
             --export-debug "Android" \
             build/goias-roleplay.apk
 
-      - name: Enviar APK
+      - name: Disponibilizar APK
         uses: actions/upload-artifact@v4
         with:
           name: GoiasRP-Godot-APK
