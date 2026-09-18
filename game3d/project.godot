@@ -1,11 +1,14 @@
-; Goiás RolePlay - Projeto Godot
+; Goiás RolePlay
 
 config_version=5
 
 [application]
 
-config/name="Goiás RolePlay"
+config/name="Goias RolePlay"
+config/name_localized="Goias RolePlay"
 run/main_scene="res://Main.tscn"
+
+config/features=PackedStringArray("4.5", "GL Compatibility")
 
 [display]
 
