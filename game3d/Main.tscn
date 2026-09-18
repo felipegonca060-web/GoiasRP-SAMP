@@ -1,19 +1,19 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=4 format=3]
 
-[sub_resource type="Environment" id="Environment_main"]
-background_mode = 1
-background_color = Color(0.35, 0.65, 0.85, 1)
-ambient_light_source = 3
-ambient_light_color = Color(1, 1, 1, 1)
-ambient_light_energy = 0.7
+[ext_resource type="Script" path="res://Player.gd" id="1_player"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
+height = 1.8
+radius = 0.45
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape_player"]
+height = 1.8
+radius = 0.45
 
 [node name="GoiasRolePlay" type="Node3D"]
 
-[node name="Environment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_main")
-
 [node name="Camera3D" type="Camera3D" parent="."]
-position = Vector3(0, 5, 10)
+position = Vector3(0, 4, 8)
 rotation_degrees = Vector3(-15, 0, 0)
 current = true
 
@@ -25,14 +25,29 @@ light_energy = 1.2
 position = Vector3(0, -1, 0)
 size = Vector3(40, 2, 40)
 
-[node name="CityBlock" type="CSGBox3D" parent="."]
-position = Vector3(0, 1, -5)
-size = Vector3(8, 4, 6)
+[node name="Building1" type="CSGBox3D" parent="."]
+position = Vector3(0, 2, -8)
+size = Vector3(8, 6, 6)
 
-[node name="CityBlock2" type="CSGBox3D" parent="."]
-position = Vector3(12, 1, -5)
-size = Vector3(8, 4, 6)
+[node name="Building2" type="CSGBox3D" parent="."]
+position = Vector3(12, 2, -8)
+size = Vector3(7, 6, 6)
 
-[node name="CityBlock3" type="CSGBox3D" parent="."]
-position = Vector3(-12, 1, -5)
-size = Vector3(8, 4, 6)
+[node name="Building3" type="CSGBox3D" parent="."]
+position = Vector3(-12, 2, -8)
+size = Vector3(7, 6, 6)
+
+[node name="Player" type="CharacterBody3D" parent="."]
+position = Vector3(0, 1, 0)
+script = ExtResource("1_player")
+
+[node name="Mesh" type="MeshInstance3D" parent="Player"]
+mesh = SubResource("CapsuleMesh_player")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+shape = SubResource("CapsuleShape_player")
+
+[node name="PlayerCamera" type="Camera3D" parent="Player"]
+position = Vector3(0, 3, 6)
+rotation_degrees = Vector3(-15, 0, 0)
+current = true
