@@ -24,8 +24,7 @@ jobs:
       - name: Configurar Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: "platform-tools platforms;android-35 build-tools;35.0.0"
-
+          packages: "platform-tools platforms;android-35 build-tools;35.0.0 cmdline-tools;latest cmake;3.10.2.4988404 ndk;28.1.13356709"
       - name: Instalar Godot
         uses: chickensoft-games/setup-godot@v2
         with:
@@ -35,7 +34,7 @@ jobs:
       - name: Instalar templates Android
         run: |
           TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/4.5.1.stable"
-          mkdir -p "$TEMPLATE_DIR"
+          echo "4.5.1.stable" > "$TEMPLATE_DIR/version.txt"
 
           wget -O /tmp/templates.tpz \
             "https://github.com/godotengine/godot/releases/download/4.5.1-stable/Godot_v4.5.1-stable_export_templates.tpz"
