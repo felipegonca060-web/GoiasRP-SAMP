@@ -43,10 +43,11 @@ jobs:
       - name: Criar pasta de saída
         run: mkdir -p game3d/build
 
-      - name: Exportar APK
+            - name: Exportar APK
         run: |
           godot --headless \
             --path game3d \
+            --verbose \
             --export-debug "Android" \
             build/goias-roleplay.apk
 
