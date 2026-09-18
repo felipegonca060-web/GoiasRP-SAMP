@@ -83,7 +83,7 @@ jobs:
         run: |
           mkdir -p game3d/build
 
-            - name: Validar preset Android
+           - name: Validar preset Android
         run: |
           cd game3d
 
