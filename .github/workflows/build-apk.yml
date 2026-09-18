@@ -21,31 +21,36 @@ jobs:
           version: 4.5.1
           use-dotnet: false
 
-      - name: Verificar arquivos
+      - name: Instalar templates Android do Godot
         run: |
-          echo "Projeto:"
-          ls -la game3d
-          echo "Workflow:"
-          ls -la .github/workflows
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.5.1.stable"
 
-      - name: Verificar projeto Godot
+          wget -O /tmp/templates.tpz \
+            https://github.com/godotengine/godot/releases/download/4.5.1-stable/Godot_v4.5.1-stable_export_templates.tpz
+
+          unzip -q /tmp/templates.tpz -d /tmp/godot-templates
+
+          find /tmp/godot-templates -type f -name "android_debug.apk" \
+            -exec cp {} "$HOME/.local/share/godot/export_templates/4.5.1.stable/" \;
+
+          find /tmp/godot-templates -type f -name "android_release.apk" \
+            -exec cp {} "$HOME/.local/share/godot/export_templates/4.5.1.stable/" \;
+
+      - name: Verificar templates
         run: |
-          godot --headless \
-            --path game3d \
-            --editor \
-            --quit
+          ls -lh "$HOME/.local/share/godot/export_templates/4.5.1.stable/"
 
-      - name: Criar saída
+      - name: Criar pasta de saída
         run: mkdir -p game3d/build
 
-      - name: Exportar Android
+      - name: Exportar APK
         run: |
           godot --headless \
             --path game3d \
             --export-debug "Android" \
             build/goias-roleplay.apk
 
-      - name: Enviar APK
+      - name: Disponibilizar APK
         uses: actions/upload-artifact@v4
         with:
           name: GoiasRP-Godot-APK
