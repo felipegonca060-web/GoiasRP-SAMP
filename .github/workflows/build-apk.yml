@@ -1,11 +1,11 @@
-name: Build Goiás RolePlay Godot APK
+name: Build Goias RolePlay Godot APK
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - 'game3d/**'
-      - '.github/workflows/build-apk.yml'
+      - "game3d/**"
+      - ".github/workflows/build-apk.yml"
 
 jobs:
   build:
@@ -21,18 +21,14 @@ jobs:
           version: 4.5.1
           use-dotnet: false
 
-      - name: Instalar templates Android do Godot
+      - name: Instalar templates Android
         run: |
           mkdir -p "$HOME/.local/share/godot/export_templates/4.5.1.stable"
-
           wget -O /tmp/templates.tpz \
             https://github.com/godotengine/godot/releases/download/4.5.1-stable/Godot_v4.5.1-stable_export_templates.tpz
-
           unzip -q /tmp/templates.tpz -d /tmp/godot-templates
-
           find /tmp/godot-templates -type f -name "android_debug.apk" \
             -exec cp {} "$HOME/.local/share/godot/export_templates/4.5.1.stable/" \;
-
           find /tmp/godot-templates -type f -name "android_release.apk" \
             -exec cp {} "$HOME/.local/share/godot/export_templates/4.5.1.stable/" \;
 
@@ -40,10 +36,18 @@ jobs:
         run: |
           ls -lh "$HOME/.local/share/godot/export_templates/4.5.1.stable/"
 
-      - name: Criar pasta de saída
-        run: mkdir -p game3d/build
+      - name: Verificar projeto
+        run: |
+          godot --headless \
+            --path game3d \
+            --editor \
+            --quit
 
-            - name: Exportar APK
+      - name: Criar pasta de saída
+        run: |
+          mkdir -p game3d/build
+
+      - name: Exportar APK
         run: |
           godot --headless \
             --path game3d \
@@ -51,7 +55,7 @@ jobs:
             --export-debug "Android" \
             build/goias-roleplay.apk
 
-      - name: Disponibilizar APK
+      - name: Enviar APK
         uses: actions/upload-artifact@v4
         with:
           name: GoiasRP-Godot-APK
