@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Baixar projeto
         uses: actions/checkout@v4
 
@@ -79,38 +80,48 @@ jobs:
           echo "===== VERSION ====="
           cat "$HOME/.local/share/godot/export_templates/4.5.1.stable/version.txt"
 
+      - name: Verificar projeto
+        run: |
+          echo "===== PROJECT ====="
+          cat game3d/project.godot
+
+          echo "===== PRESET ====="
+          cat game3d/export_presets.cfg
+
+          echo "===== ARQUIVOS ====="
+          find game3d -maxdepth 2 -type f -print
+
       - name: Criar saída
         run: |
           mkdir -p game3d/build
 
-           - name: Validar preset Android
+      - name: Validar projeto Godot
         run: |
-          cd game3d
+          godot \
+            --headless \
+            --path game3d \
+            --editor \
+            --quit \
+            --verbose
 
-          echo "===== ARQUIVOS ====="
-          ls -lah
+      - name: Exportar APK Android
+        run: |
+          mkdir -p game3d/build
 
-          echo "===== PRESET ====="
-          cat export_presets.cfg
-
-          echo "===== PROJETO ====="
-          cat project.godot
-
-          echo "===== EXPORT PRESETS ====="
-          godot --headless --path . --editor --quit --verbose
-
-          echo "===== EXPORT ====="
-          mkdir -p build
-
-          godot --headless \
-            --path . \
+          godot \
+            --headless \
+            --path game3d \
             --editor \
             --export-debug "Android" \
             build/goias-roleplay.apk
 
       - name: Verificar APK
         run: |
+          echo "===== APK ====="
           ls -lh game3d/build/goias-roleplay.apk
+
+          echo "===== TIPO ====="
+          file game3d/build/goias-roleplay.apk
 
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v4
